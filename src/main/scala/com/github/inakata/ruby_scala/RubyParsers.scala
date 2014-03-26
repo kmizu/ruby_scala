@@ -2,7 +2,7 @@ package com.github.inakata.ruby_scala
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
 
-class Ruby extends RegexParsers with PackratParsers with TracableParsers {
+class RubyParsers extends RegexParsers with PackratParsers with TracableParsers {
 
   override def skipWhitespace = false
 
