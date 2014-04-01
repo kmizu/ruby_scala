@@ -6,10 +6,11 @@ package com.github.inakata.ruby_scala
 object RubyAst {
   case class Position(line: Int, column: Int)
   abstract class Node(position: Position)
-  case class RawStringLiteral(content: String, position: Position) extends Node(position)
-  case class FixnumLiteral(content: Int, position: Position) extends Node(position)
-  case class BignumLiteral(content: BigInt, position: Position) extends Node(position)
-  case class FloatLiteral(content: Float, position: Position) extends Node(position)
-  case class DoubleLiteral(content: Double, position: Position) extends Node(position)
-  case class BooleanLiteral(content: Boolean, position: Position) extends Node(position)
+  abstract class Expression(position: Position) extends Node(position)
+  case class RawStringLiteral(content: String, position: Position) extends Expression(position)
+  case class FixnumLiteral(content: Int, position: Position) extends Expression(position)
+  case class BignumLiteral(content: BigInt, position: Position) extends Expression(position)
+  case class FloatLiteral(content: Float, position: Position) extends Expression(position)
+  case class DoubleLiteral(content: Double, position: Position) extends Expression(position)
+  case class BooleanLiteral(content: Boolean, position: Position) extends Expression(position)
 }
