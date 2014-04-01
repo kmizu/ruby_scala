@@ -13,4 +13,5 @@ object RubyAst {
   case class FloatLiteral(content: Float, position: Position) extends Expression(position)
   case class DoubleLiteral(content: Double, position: Position) extends Expression(position)
   case class BooleanLiteral(content: Boolean, position: Position) extends Expression(position)
+  case class ExternalCommandExecution(command: String, position: Position) extends Expression(position)
 }

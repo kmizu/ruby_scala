@@ -1178,7 +1178,7 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
              QuotedNonExpandedLiteralString |
              QuotedExpandedLiteralString |
              HereDocument |
-             ExternalCommandExecution
+             (ExternalCommandExecution ^^ {_.toString}) //FIXME
 
 // 8.7.6.3.2 Single quoted strings
 
@@ -1464,13 +1464,15 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
 
 // 8.7.6.3.7 External command execution
 
-  lazy val ExternalCommandExecution: Parser[String] =
+  lazy val ExternalCommandExecution: Parser[Any] =
              BackquotedExternalCommandExecution |
              QuotedExternalCommandExecution
 
-  lazy val BackquotedExternalCommandExecution: Parser[String] =
-             regex("""`""".r) ~ ((BackquotedExternalCommandExecutionCharacter*) ^^ { (_).mkString } ) ~
-                 regex("""`""".r) ^^ { case r1~s~r2 => "`"+s+"`" }
+  lazy val BackquotedExternalCommandExecution: Parser[RubyAst.Expression] = {
+    regex( """`""".r) ~> ((BackquotedExternalCommandExecutionCharacter *) ^^ {_.mkString}) <~ regex( """`""".r) ^^ {
+      case s => RubyAst.ExternalCommandExecution(s, null)
+    }
+  }
 
   lazy val BackquotedExternalCommandExecutionCharacter: Parser[String] =
              not(regex("""`|#|\\""".r)) ~ SourceCharacter ^^ { case n~c => c } |
