@@ -1168,7 +1168,7 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
 
   lazy val OctalDigit: Parser[String] = regex("""[0-7]""".r)
 
-  lazy val HexadecimalDigit: Parser[String] = DecimalDigit | regex("""[a-fA-F]""".r)
+  lazy val HexadecimalDigit: Parser[String] = regex("""[0-9a-fA-F]""".r)
 
 // 8.7.6.3 String literals
 
