@@ -150,21 +150,15 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
 
 // 10.1, 10.2,
 
-  lazy val program: Parser[Any] =
-             compoundStatement
+  lazy val program: Parser[Any] = compoundStatement
 
-  lazy val compoundStatement: Parser[String] =
-             memo(??(statementList) <~ ??(separatorList))
+  lazy val compoundStatement: Parser[String] = memo(??(statementList) <~ ??(separatorList))
 
-  lazy val statementList: Parser[String] =
-             memo(rep1sep(statement, separatorList) ^^ { (_).mkString("", "\n", "") } )
+  lazy val statementList: Parser[String] = memo(rep1sep(statement, separatorList) ^^ { (_).mkString("", "\n", "") } )
 
-  lazy val separatorList: Parser[String] =
-             ( separator+ ) ^^ { case e => ";" }
+  lazy val separatorList: Parser[String] = ( separator+ ) ^^ { case e => ";" }
 
-  lazy val separator: Parser[String] =
-             LineTerminator |
-             SEMICOLON
+  lazy val separator: Parser[String] = LineTerminator | SEMICOLON
 
 
 // 11.1
@@ -174,48 +168,47 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
                             case n~op => (l: String, r: String) => "("+ l+" "+op+" "+r +")" } ))
 
   lazy val notExpression: Parser[String] = memo(
-             keywordNotExpression |
-             NotOP ~ methodInvocationWithoutParentheses ^^ {case n~m => "!" + m } |
-             methodInvocationWithoutParentheses |
-             operatorExpression )
+    keywordNotExpression
+  | NotOP ~ methodInvocationWithoutParentheses ^^ {case n~m => "!" + m }
+  | methodInvocationWithoutParentheses
+  | operatorExpression )
 
-  lazy val keywordNotExpression: Parser[String] =
-             NOT ~ notExpression ^^ { case n~e => "(not " +e+ ")" }
+  lazy val keywordNotExpression: Parser[String] = NOT ~ notExpression ^^ { case n~e => "(not " +e+ ")" }
 
 // 11.2.3 Logical AND expressions
 
   lazy val operatorAndExpression: Parser[String] = memo(
-             chainl1 ( equalityExpression, not(LineTerminator) ~ AndOP ^^ {
-                             case n~o => (l: String, r: String) => "("+l+" "+o+" "+r+")" } ))
+    chainl1 ( equalityExpression, not(LineTerminator) ~ AndOP ^^ {
+      case n~o => (l: String, r: String) => "("+l+" "+o+" "+r+")" } ))
 
 // 11.2.4 Logical OR expressions
 
   lazy val operatorOrExpression: Parser[String] = memo(
-             chainl1 ( operatorAndExpression, not(LineTerminator) ~ OrOP ^^ {
-                             case n~o => (l: String, r: String) => "("+l+" "+o+" "+r+")" } ))
+    chainl1 ( operatorAndExpression, not(LineTerminator) ~ OrOP ^^ {
+      case n~o => (l: String, r: String) => "("+l+" "+o+" "+r+")" } ))
 
 // 11.3.1
 
   lazy val primaryMethodInvocation: Parser[String] = memo(
-             superWithOptionalArgument |
-             MethodOnlyIdentifier |
-             MethodIdentifier ~ block ^^ { case m~b => m + b } |
-             MethodIdentifier ~ not(WS) ~ argumentWithParentheses ~ ??(block) ^^ {
-                             case m~n~a~b => m + a + b } )
+    superWithOptionalArgument
+  | MethodOnlyIdentifier
+  | MethodIdentifier ~ block ^^ { case m~b => m + b }
+  | MethodIdentifier ~ not(WS) ~ argumentWithParentheses ~ ??(block) ^^ { case m~n~a~b => m + a + b } )
 
-  lazy val MethodIdentifier: Parser[String] =
-             MethodID |
-             ConstantIdentifier |
-             MethodOnlyIdentifier // not LocalVariableIdentifier
+  lazy val MethodIdentifier: Parser[String] = (
+    MethodID
+  | ConstantIdentifier
+  | MethodOnlyIdentifier // not LocalVariableIdentifier //
+  )
 
-  lazy val methodName: Parser[String] =
-             OperatorMethodName |
-             MethodIdentifier |
-             Keyword
+  lazy val methodName: Parser[String] = (
+    OperatorMethodName
+  | MethodIdentifier
+  | Keyword
+  )
 
 // lazy val indexing-method-invocation // in primaryExpression
-  lazy val methodNameExceptConstant: Parser[String] =
-             not(ConstID) ~ methodName ^^ { case n~m => m }
+  lazy val methodNameExceptConstant: Parser[String] = not(ConstID) ~ methodName ^^ { case n~m => m }
 
   lazy val methodInvocationWithoutParentheses: Parser[String] = memo(
              command ^^ { case c => "method-inv-without-par("+c+")" } |
