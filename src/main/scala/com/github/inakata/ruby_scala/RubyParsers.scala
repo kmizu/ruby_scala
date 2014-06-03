@@ -1,7 +1,7 @@
 package com.github.inakata.ruby_scala
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
-import com.github.inakata.ruby_scala.RubyAst.DoubleQuotedStringLiteral
+import com.github.inakata.ruby_scala.RubyAst.{SingleQuotedStringLiteral, DoubleQuotedStringLiteral}
 
 class RubyParsers extends RegexParsers with PackratParsers with TracableParsers {
 
@@ -1162,18 +1162,18 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
 // 8.7.6.3 String literals
 
   lazy val StringLiteral: Parser[String] =
-             SingleQuotedString |
+             /* SingleQuotedString | */
              /* DoubleQuotedString | */
              QuotedNonExpandedLiteralString |
              QuotedExpandedLiteralString |
              HereDocument |
-             (ExternalCommandExecution ^^ {_.toString}) //FIXME
+             (ExternalCommandExecution ^^ {_.toString})
 
 // 8.7.6.3.2 Single quoted strings
 
-  lazy val SingleQuotedString: Parser[String] =
-             regex("""'""".r) ~ ((SingleQuotedStringCharacter*) ^^ { (_).mkString } ) ~ regex("""'""".r) ^^ {
-                                   case r1~s~r2 => "'"+s+"'" }
+  lazy val SingleQuotedString: Parser[SingleQuotedStringLiteral] = (regex("""'""".r) ~> ((SingleQuotedStringCharacter*) ^^ {_.mkString } ) <~regex("""'""".r)) ^^ {content =>
+    SingleQuotedStringLiteral(content)
+  }
 
   lazy val SingleQuotedStringCharacter: Parser[String] =
              SingleQuotedStringNonEscapedCharacter |
