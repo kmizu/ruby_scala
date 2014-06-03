@@ -1,6 +1,7 @@
 package com.github.inakata.ruby_scala
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
+import com.github.inakata.ruby_scala.RubyAst.DoubleQuotedStringLiteral
 
 class RubyParsers extends RegexParsers with PackratParsers with TracableParsers {
 
@@ -1162,7 +1163,7 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
 
   lazy val StringLiteral: Parser[String] =
              SingleQuotedString |
-             DoubleQuotedString |
+             /* DoubleQuotedString | */
              QuotedNonExpandedLiteralString |
              QuotedExpandedLiteralString |
              HereDocument |
@@ -1196,9 +1197,9 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
 
 // 8.7.6.3.3 Double quoted strings
 
-  lazy val DoubleQuotedString: Parser[String] =
-             regex(""""""".r) ~ ((DoubleQuotedStringCharacter*) ^^ { (_).mkString } ) ~ regex(""""""".r) ^^ {
-                                   case r1~s~r2 => "\""+s+"\"" }
+  lazy val DoubleQuotedString: Parser[DoubleQuotedStringLiteral] = (regex(""""""".r) ~> ((DoubleQuotedStringCharacter*) ^^ {_.mkString} ) <~ regex(""""""".r)) ^^ {content =>
+    DoubleQuotedStringLiteral(content)
+  }
 
   lazy val DoubleQuotedStringCharacter: Parser[String] =
              not(regex(""""|#|\\""".r)) ~ SourceCharacter ^^ { case n~s => s } |
@@ -1458,7 +1459,7 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
 
   lazy val BackquotedExternalCommandExecution: Parser[RubyAst.Expression] = {
     regex( """`""".r) ~> ((BackquotedExternalCommandExecutionCharacter *) ^^ {_.mkString}) <~ regex( """`""".r) ^^ {
-      case s => RubyAst.ExternalCommandExecution(s, null)
+      case s => RubyAst.ExternalCommandExecution(s)
     }
   }
 
