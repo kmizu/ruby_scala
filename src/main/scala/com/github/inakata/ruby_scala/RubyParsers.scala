@@ -1377,14 +1377,9 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
                }
              }
 
-//  lazy val HereDocument: Parser[String] =
-//             HeredocStartLine >> { case heredocDelimiter => HeredocBody(heredocDelimiter) ~
-//                 HeredocEndLine(heredocDelimiter) ^^ { case b~e => "Heredoc(\n"+b+")" } }
   lazy val HeredocStartLine: Parser[(String, String)] =
              HeredocSignifier ~ RestOfLine ^^ { case s~r => (s, r) }
 
-//  lazy val HeredocStartLine: Parser[String] =
-//             HeredocSignifier ~ RestOfLine ^^ { case s~r => s }
   lazy val HeredocSignifier: Parser[String] =
              regex("""<<""".r) ~ HeredocDelimiterSpecifier ^^ { case r~s => s }
 
