@@ -25,17 +25,12 @@ class RubyParsers extends RegexParsers with PackratParsers with TracableParsers 
   lazy val InstanceID: Parser[String] = Spacing~>regex("""@[a-zA-Z_][a-zA-Z0-9_]*""".r)
 
 // 8.2 Program text
-  lazy val SourceCharacter: Parser[String] =
-             regex("""[\u0000-\u007f]""".r)
+  lazy val SourceCharacter: Parser[String] = regex("""[\u0000-\u007f]""".r)
 // 8.3 Line terminators
-  lazy val LineTerminator: Parser[String] =
-             anySpaceWithoutLT~>regex("""\u000a|\u000d\u000a""".r) //^^ { case a => " EOL\n" }
+  lazy val LineTerminator: Parser[String] = anySpaceWithoutLT~>regex("""\u000a|\u000d\u000a""".r) //^^ { case a => " EOL\n" }
 // 8.4 Whitespace
-  lazy val Whitespace: Parser[String] =
-             ("\u0009" | "\u000b" | "\u000c" | "\u000d" | "\u0020" ) |
-             LineTerminatorEscapeSequence
-  lazy val LineTerminatorEscapeSequence: Parser[String] =
-             "\\" ~ LineTerminator ^^ { case s~l => " escaped-EOL\n" }
+  lazy val Whitespace: Parser[String] = ("\u0009" | "\u000b" | "\u000c" | "\u000d" | "\u0020" ) | LineTerminatorEscapeSequence
+  lazy val LineTerminatorEscapeSequence: Parser[String] = "\\" ~ LineTerminator ^^ { case s~l => " escaped-EOL\n" }
 
   lazy val IdentifierCharacter: Parser[String] = regex("""[a-zA-Z0-9_]""".r)
   lazy val UppercaseCharacter: Parser[String] = regex("""[A-Z]""".r)
