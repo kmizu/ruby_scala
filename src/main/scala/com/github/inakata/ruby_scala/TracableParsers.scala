@@ -11,16 +11,7 @@ trait TracableParsers extends Parsers {self =>
   class Parser[+T](wrapped: super.Parser[T]) extends super.Parser[T] {
     def apply(in: Input): ParseResult[T] = {
       val name = names.get(this).getOrElse("?")
-      val flag = false // name.head.isLower && name != "anySpace"
-      if (flag) println("app " + name + ":" + in.pos)
       val result = wrapped(in)
-      if (flag) {
-        print("ret " + name +" "+ result.toString+";")
-        result match {
-          case Failure(_, next) => println(" Failed: " + next.pos)
-          case Success(_, next)  => println(" Succeeded: " + next.pos)
-        }
-      }
       result
     }
   }
